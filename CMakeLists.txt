@@ -4,6 +4,14 @@ project(LearnShader)
 
 find_package(glfw3 REQUIRED)
 find_package(glad CONFIG REQUIRED)
+find_package(GLEW REQUIRED)
+find_package(GLUT REQUIRED)
+find_package(OpenGL REQUIRED)
+
+find_package( OpenCV REQUIRED )
+
+include_directories("D:\\vcpkg\\installed\\x64-windows\\include")
+message("glew include : ${GLEW_LIBRARIES}")
 
 find_package(Pangolin CONFIG REQUIRED)
 include_directories(${Pangolin_INCLUDE_DIRS})
@@ -21,3 +29,13 @@ add_executable(test2 test/test2.cpp)
 target_link_libraries( test2 
 	PRIVATE
 	pangolin)
+
+
+#-- test3 render to texture
+add_executable(test3 test/test3.cpp)
+target_link_libraries( test3 
+	glfw
+	${OPENGL_LIBRARIES}
+	${GLEW_LIBRARIES}
+	${OpenCV_LIBS}
+)

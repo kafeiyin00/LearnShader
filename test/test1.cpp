@@ -14,24 +14,37 @@ void processInput(GLFWwindow *window)
 		glfwSetWindowShouldClose(window, true);
 }
 
-const char *vertexShaderSource = "#version 330 core\n"
-"layout (location = 0) in vec3 aPos;\n"
-"void main()\n"
-"{\n"
-"   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-"}\0";
-const char *fragmentShader1Source = "#version 330 core\n"
-"out vec4 FragColor;\n"
-"void main()\n"
-"{\n"
-"   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
-"}\n\0";
-const char *fragmentShader2Source = "#version 330 core\n"
-"out vec4 FragColor;\n"
-"void main()\n"
-"{\n"
-"   FragColor = vec4(1.0f, 1.0f, 0.0f, 1.0f);\n"
-"}\n\0";
+GLuint shader_programme;
+GLuint vs;
+GLuint fs;
+
+void loadShader() {
+	const char* vertex_shader =
+		"#version 400\n"
+		"in vec3 vp;"
+		"void main() {"
+		"  gl_Position = vec4(vp, 1.0);"
+		"}";
+
+	const char* fragment_shader =
+		"#version 400\n"
+		"out vec4 frag_colour;"
+		"void main() {"
+		"  frag_colour = vec4(1.0f, 0.5f, 0.2f, 1.0f);"
+		"}";
+
+	vs = glCreateShader(GL_VERTEX_SHADER);
+	glShaderSource(vs, 1, &vertex_shader, NULL);
+	glCompileShader(vs);
+	fs = glCreateShader(GL_FRAGMENT_SHADER);
+	glShaderSource(fs, 1, &fragment_shader, NULL);
+	glCompileShader(fs);
+
+	shader_programme = glCreateProgram();
+	glAttachShader(shader_programme, fs);
+	glAttachShader(shader_programme, vs);
+	glLinkProgram(shader_programme);
+}
 
 int main()
 {
