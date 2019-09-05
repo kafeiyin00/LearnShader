@@ -12,16 +12,18 @@ GLuint fs;
 void loadShader() {
 	const char* vertex_shader =
 		"#version 400\n"
-		"in vec3 vp;"
+		"layout(location = 0) in vec3 vp;"
 		"void main() {"
-		"  gl_Position = vec4(vp, 1.0);"
+		"  gl_Position = vec4(vp.x , vp.y *0.3, vp.z * 0.8, 1.0);"
 		"}";
 
 	const char* fragment_shader =
 		"#version 400\n"
-		"out vec4 frag_colour;"
+		"layout(location = 0) out vec4 frag_colour;"
+		" out vec4 colorOut;"
 		"void main() {"
 		"  frag_colour = vec4(1.0f, 0.5f, 0.2f, 1.0f);"
+		"  colorOut = vec4(1.0f, 0.0f, 0.0f, 1.0f);"
 		"}";
 
 	vs = glCreateShader(GL_VERTEX_SHADER);
@@ -34,7 +36,19 @@ void loadShader() {
 	shader_programme = glCreateProgram();
 	glAttachShader(shader_programme, fs);
 	glAttachShader(shader_programme, vs);
+	//glBindFragDataLocation(shader_programme, 0, "colorOut");
 	glLinkProgram(shader_programme);
+
+	//打印编译信息，如果编译错误，就可以看见错误信息了  
+	auto result = GL_FALSE;
+	auto info_length = 0;
+	glGetProgramiv(shader_programme, GL_LINK_STATUS, &result);
+	if (result == GL_FALSE) {
+		glGetProgramiv(shader_programme, GL_INFO_LOG_LENGTH, &info_length);
+		std::string program_log((unsigned long)info_length, ' ');
+		glGetProgramInfoLog(shader_programme, info_length, NULL, &program_log[0]);
+		std::cout << program_log << std::endl;
+	}
 }
 
 static bool glewInitiatalized = false;
@@ -174,7 +188,6 @@ int main()
 	};
 
 	loadShader();
-
 	GLuint vbo = 0;
 	glGenBuffers(1, &vbo);
 	GLuint vao = 0;
@@ -185,7 +198,7 @@ int main()
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);	// Vertex attributes stay the same
 	glEnableVertexAttribArray(0);
 	glBindVertexArray(0);
-
+	
 	glBindVertexArray(vao);
 	glUseProgram(shader_programme);
 	glDrawArrays(GL_TRIANGLES, 0, 3);	// this call should output a triangle
@@ -198,7 +211,7 @@ int main()
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 
-	
+	//glEnable(GL_DEPTH_TEST);
 	while (!glfwWindowShouldClose(window)) {
 		// input
 		//processInput(window);
@@ -208,6 +221,7 @@ int main()
 		glClear(GL_COLOR_BUFFER_BIT);
 		glBindVertexArray(vao);
 		glUseProgram(shader_programme);
+		
 		glDrawArrays(GL_TRIANGLES, 0, 3);	// this call should output a triangle
 		glUseProgram(0);
 		glBindVertexArray(0);

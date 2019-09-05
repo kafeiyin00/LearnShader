@@ -16,6 +16,21 @@ message("glew include : ${GLEW_LIBRARIES}")
 find_package(Pangolin CONFIG REQUIRED)
 include_directories(${Pangolin_INCLUDE_DIRS})
 
+set(SHADER_FOLDER_PATH "\"${PROJECT_SOURCE_DIR}/shaders/\"")
+
+configure_file (
+  "${PROJECT_SOURCE_DIR}/Config.h.in"
+  "${PROJECT_SOURCE_DIR}/Config.h"
+)
+
+
+include_directories(".")
+include_directories(src)
+
+add_library(libShader 
+	src/vsShaderLib.cpp
+)
+
 
 #-- test1 raw glsw and glad
 add_executable(test1 test/test1.cpp)
@@ -38,4 +53,13 @@ target_link_libraries( test3
 	${OPENGL_LIBRARIES}
 	${GLEW_LIBRARIES}
 	${OpenCV_LIBS}
+)
+
+#-- test4 glsl test
+add_executable(test4 test/test_glsl_helloWorld.cpp)
+target_link_libraries( test4 
+	glfw
+	${OPENGL_LIBRARIES}
+	${GLEW_LIBRARIES}
+	libShader
 )
