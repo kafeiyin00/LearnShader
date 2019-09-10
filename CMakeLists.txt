@@ -10,6 +10,12 @@ find_package(OpenGL REQUIRED)
 
 find_package( OpenCV REQUIRED )
 
+FIND_PACKAGE(CUDA REQUIRED)
+message("cuda include : ${CUDA_INCLUDE_DIRS} : ${CUDA_LIBRARIES}")
+include_directories(${CUDA_INCLUDE_DIRS})
+include_directories("C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v10.0/include")
+include_directories("C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v10.0\\include")
+
 include_directories("D:\\vcpkg\\installed\\x64-windows\\include")
 message("glew include : ${GLEW_LIBRARIES}")
 
@@ -62,4 +68,20 @@ target_link_libraries( test4
 	${OPENGL_LIBRARIES}
 	${GLEW_LIBRARIES}
 	libShader
+)
+
+#-- test5 texture test
+#add_executable(test5 test/test_texture.cpp)
+#target_link_libraries( test5 
+#	glfw
+#	${OPENGL_LIBRARIES}
+#	${GLEW_LIBRARIES}
+#	libShader
+#	${OpenCV_LIBS}
+#)
+
+#-- test6 cuda test
+cuda_add_executable(test6 test/test_cuda.cu)
+target_link_libraries( test6 
+	${CUDA_LIBRARIES}
 )
