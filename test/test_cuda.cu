@@ -1,4 +1,5 @@
 #include <iostream>
+// for the IDE detection
 #include "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v10.0/include/cuda_runtime.h"
 #include "cuda_runtime.h"
 
@@ -20,6 +21,7 @@ void getCudaState(){
 		cudaGetDeviceProperties(&prop, i);
 		std::cout << "显卡名称：" << prop.name << std::endl;
 		std::cout << "显存大小：" << prop.totalGlobalMem / 1024 / 1024 << " MB" << std::endl;
+        //std::cout << "block count：" << prop.multiProcessorCount<< std::endl;
 		std::cout << "一个block的共享内存大小：" << prop.sharedMemPerBlock / 1024 << " KB" << std::endl;
 		std::cout << "block最大线程数：" << prop.maxThreadsPerBlock << std::endl;
 	}
@@ -57,7 +59,7 @@ int main()
 
 
     for (int i = 0; i < arraySize; ++i) {
-        std::cout<<h_out[i]<<"\n";
+        //std::cout<<h_out[i]<<"\n";
     }
 
     cudaFree(d_in);
