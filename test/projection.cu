@@ -18,10 +18,10 @@ __global__ void gpu_project(float* d_xs, float* d_ys, float* d_zs,
 	float depth = sqrt(x * x + y * y + z * z);
 
 	//theta phi to image coordinates
-	int u = 2000 - (theta / 360.0) * 2000;
-	int v = phi / 180.0 * 1000;
+	int u = (theta / 360.0) * 600;
+	int v = phi / 180.0 * 300;
 
-	prjectionId[idx] = v * 2000 + u;
+	prjectionId[idx] = v * 600 + u;
 	d_ds[idx] = depth;
 
 }

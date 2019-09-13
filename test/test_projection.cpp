@@ -86,10 +86,10 @@ void projectCPU(float *h_xs, float *h_ys, float *h_zs, float *h_ds, int *h_pojec
 		float depth = sqrt(x * x + y * y + z * z);
 
 		//theta phi to image coordinates
-		int u = 2000 - (theta / 360.0)*2000;
-		int v = phi / 180.0*1000;
+		int u = (theta / 360.0)*600;
+		int v = phi / 180.0*300;
 
-		h_pojectionIds[i] = v * 2000 + u;
+		h_pojectionIds[i] = v * 600 + u;
 		h_ds[i] = depth;
 	}
 }
@@ -135,8 +135,8 @@ int main(){
 	printf("CPU Use Time:%f\n", (dur * 1000 / CLOCKS_PER_SEC)); // ms
 
 	//z-buffer
-	float * depthMap = new float[2000*1000];
-	for (size_t i = 0; i < 2000 * 1000; i++)
+	float * depthMap = new float[600*300];
+	for (size_t i = 0; i < 600*300; i++)
 	{
 		depthMap[i] = 999.9;
 	}
@@ -145,11 +145,11 @@ int main(){
 		if (depthMap[h_pojectionIds[i]] < h_ds[i]) {
 			continue;
 		}
-		assert(h_pojectionIds[i] < 2000 * 1000);
+		assert(h_pojectionIds[i] < 600*300);
 		depthMap[h_pojectionIds[i]] = h_ds[i];
 	}
 
-	showDepthMap(depthMap,2000,1000);
+	showDepthMap(depthMap,600,300);
 	system("pause");
     return 0;
 
