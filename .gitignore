@@ -7,3 +7,5 @@ cmake-build-debug/
 
 
 shaders
+
+cmake-build-release/

@@ -1,3 +1,4 @@
+#include <cstdio>
 #include "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v10.0/include/cuda_runtime.h"
 #include "cudaFunction.cuh"
 
@@ -13,8 +14,8 @@ __global__ void gpu_normalEstimation(float* d_depth, int width, int height,
     float tempDepth = d_depth[idx];
 
     float phi, theta;
-    phi = row/height*3.1415926;
-    theta = col/width*2*3.1415926;
+    phi = 1.0*row/height*3.1415926;
+    theta = 1.0*col/width*2*3.1415926;
 
     float x = tempDepth*sin(phi)*cos(theta);
     float y = tempDepth*sin(phi)*sin(theta);
@@ -33,17 +34,21 @@ __global__ void gpu_normalEstimation(float* d_depth, int width, int height,
         topDepth = d_depth[(row-1)*width+col];
     }
 
+    if(leftDepth > 999 || topDepth>999 || tempDepth>999){
+        return;
+    }
+
     float leftphi, lefttheta;
-    leftphi = row/height*3.1415926;
-    lefttheta = (col-1)/width*2*3.1415926;
+    leftphi = 1.0*row/height*3.1415926;
+    lefttheta = 1.0*(col-1)/width*2*3.1415926;
     float x1 = leftDepth*sin(leftphi)*cos(lefttheta);
     float y1 = leftDepth*sin(leftphi)*sin(lefttheta);
     float z1 = leftDepth*cos(leftphi);
 
 
     float topphi, toptheta;
-    topphi = (row-1)/height*3.1415926;
-    toptheta = col/width*2*3.1415926;
+    topphi = 1.0*(row-1)/height*3.1415926;
+    toptheta = 1.0*col/width*2*3.1415926;
     float x2 = topDepth*sin(topphi)*cos(toptheta);
     float y2 = topDepth*sin(topphi)*sin(toptheta);
     float z2 = topDepth*cos(topphi);
@@ -60,6 +65,8 @@ __global__ void gpu_normalEstimation(float* d_depth, int width, int height,
 	d_nx[idx] = n1y * n2z - n1z * n2y;
 	d_ny[idx] = n1x * n2z - n1z * n2x;
 	d_nz[idx] = n1x * n2y - n1y * n2x;
+
+	//printf("%f\n",d_ny[idx]);
 
 }
 

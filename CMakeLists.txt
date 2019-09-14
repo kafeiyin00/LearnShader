@@ -103,9 +103,17 @@ target_link_libraries( test7
 		${CUDA_LIBRARIES}
 )
 
-#-- test8 projection test
+#-- test8 normal estimation test
 cuda_add_library( libcufuncs SHARED src/cudaFunction.cu)
 target_link_libraries(
-		libcuprojection
+		libcufuncs
 		${CUDA_LIBRARIES}
+)
+
+add_executable(test8 test/test_cudaEstimation.cpp)
+target_link_libraries(
+		test8
+		libcufuncs
+		${CUDA_LIBRARIES}
+		${OpenCV_LIBS}
 )
