@@ -13,7 +13,7 @@ GPU cost 298ms, CPU cost 141ms.
 ### test8: test on cuda normal estimation
 I implement the normal estimation of the projected laser scanning points
 
-GPU cost 225ms
+GPU cost 230ms
 
 ![projection](https://github.com/kafeiyin00/LearnShader/blob/master/sources/test8.jpg)
 

@@ -60,10 +60,10 @@ void projectCPU(float *h_xs, float *h_ys, float *h_zs, float *h_ds, int *h_pojec
         float depth = sqrt(x * x + y * y + z * z);
 
         //theta phi to image coordinates
-        int u = (theta / 360.0)*600;
-        int v = phi / 180.0*300;
+        int u = (theta / 360.0)*2000;
+        int v = phi / 180.0*1000;
 
-        h_pojectionIds[i] = v * 600 + u;
+        h_pojectionIds[i] = v * 2000 + u;
         h_ds[i] = depth;
     }
 }
@@ -119,8 +119,8 @@ int main(){
     printf("CPU Use Time:%f\n", (dur * 1000 / CLOCKS_PER_SEC)); // ms
 
     //z-buffer
-    float * depthMap = new float[600*300];
-    for (size_t i = 0; i < 600*300; i++)
+    float * depthMap = new float[2000*1000];
+    for (size_t i = 0; i < 2000*1000; i++)
     {
         depthMap[i] = 999.9;
     }
@@ -133,20 +133,20 @@ int main(){
         depthMap[h_pojectionIds[i]] = h_ds[i];
     }
 
-    float* h_nx = new float[600*300];
-    float* h_ny = new float[600*300];
-    float* h_nz = new float[600*300];
-    memset((void*)h_nx,0,600*300* sizeof(float));
-    memset((void*)h_ny,0,600*300* sizeof(float));
-    memset((void*)h_nz,0,600*300* sizeof(float));
+    float* h_nx = new float[2000*1000];
+    float* h_ny = new float[2000*1000];
+    float* h_nz = new float[2000*1000];
+    memset((void*)h_nx,0,2000*1000* sizeof(float));
+    memset((void*)h_ny,0,2000*1000* sizeof(float));
+    memset((void*)h_nz,0,2000*1000* sizeof(float));
 
     start = clock();
     //gpu
-    calculateNormal(depthMap,600,300,h_nx,h_ny,h_nz);
+    calculateNormal(depthMap,2000,1000,h_nx,h_ny,h_nz);
     end = clock();
 
     dur = (double)(end - start);
     printf("GPU Use Time:%f\n", (dur * 1000 / CLOCKS_PER_SEC)); // ms
 
-    showNormalMap(h_nx,h_ny,h_nz,600,300);
+    showNormalMap(h_nx,h_ny,h_nz,2000,1000);
 }
