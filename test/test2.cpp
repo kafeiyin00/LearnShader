@@ -2,41 +2,64 @@
 #include <GL/glew.h>
 #include <thread>         // std::this_thread::sleep_for
 #include <chrono>         // std::chrono::seconds
+#include <Eigen/Dense>
+#include <Eigen/Geometry>
+#include "Config.h"
 
-GLuint shader_programme;
-GLuint vs;
-GLuint fs;
+struct LaserPoint {
+    double x;
+    double y;
+    double z;
+    int intense;
+    int hour;
+    unsigned int ms_top_of_hour;
 
-void loadShader() {
-	const char* vertex_shader =
-		"#version 400\n"
-		"in vec3 vp;"
-		"void main() {"
-		"  gl_Position = vec4(vp, 1.0);"
-		"}";
+};
 
-	const char* fragment_shader =
-		"#version 400\n"
-		"out vec4 frag_colour;"
-		"void main() {"
-		"  frag_colour = vec4(1.0f, 0.5f, 0.2f, 1.0f);"
-		"}";
 
-	vs = glCreateShader(GL_VERTEX_SHADER);
-	glShaderSource(vs, 1, &vertex_shader, NULL);
-	glCompileShader(vs);
-	fs = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(fs, 1, &fragment_shader, NULL);
-	glCompileShader(fs);
+struct LaserFrame {
+    std::vector<LaserPoint> framePoints;
+    Eigen::Quaterniond q_nl;
+    Eigen::Vector3d r_nl;
+    void operator=(const LaserFrame& lf)
+    {
+        q_nl = lf.q_nl;
+        r_nl = lf.r_nl;
+        framePoints.resize(lf.framePoints.size());
+        for (int i = 0; i < framePoints.size(); i++) {
+            framePoints[i] = lf.framePoints[i];
+        }
+    }
+};
 
-	shader_programme = glCreateProgram();
-	glAttachShader(shader_programme, fs);
-	glAttachShader(shader_programme, vs);
-	glLinkProgram(shader_programme);
+void loadLaserFrames(std::vector<LaserFrame>& laserFrames, std::string filename)
+{
+    FILE* file = fopen(filename.c_str(), "rb");
+    size_t frameSize;
+    fread((char*)&frameSize, sizeof(size_t), 1, file);
+    laserFrames.resize(frameSize);
+    for (int i = 0; i < frameSize; i++) {
+        LaserFrame& tmpFrame = laserFrames[i];
+        fread((char*)&(tmpFrame.q_nl), sizeof(Eigen::Quaterniond), 1, file);
+        fread((char*)&(tmpFrame.r_nl), sizeof(Eigen::Vector3d), 1, file);
+        size_t pointSize;
+        fread((char*)&(pointSize), sizeof(size_t), 1, file);
+        tmpFrame.framePoints.resize(pointSize);
+        for (int j = 0; j < pointSize; j++) {
+            fread((char*)&(tmpFrame.framePoints[j]), sizeof(LaserPoint), 1, file);
+        }
+    }
+    fclose(file);
 }
 
 int main() 
 {
+    std::vector<LaserFrame> laserFrames;
+    std::string filename = SHADER_FOLDER_PATH"laserFrames.dat";
+    loadLaserFrames(laserFrames,filename);
+
+    std::cout<<"we loaded laser frames: "<<laserFrames.size();
+
 	pangolin::CreateWindowAndBind("LearnOpenGL: Map Viewer", 1024, 800);
 
 	// 3D Mouse handler requires depth testing to be enabled  
@@ -67,36 +90,7 @@ int main()
 	pangolin::Var<bool> menuReset("menu.Reset", false, false);
 
 
-	float points[] = {
-			0.0f,  5.f,  0.0f,
-			5.f, -5.f,  0.0f,
-			-5.f, -5.f,  0.0f
-	};
-	GLuint vbo = 0;
-	glGenBuffers(1, &vbo);
-	GLuint vao = 0;
-	glGenVertexArrays(1, &vao);
-	glBindVertexArray(vao);
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(points), points, GL_STATIC_DRAW);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);	// Vertex attributes stay the same
-	glEnableVertexAttribArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);
-
-	
-
-
-	
-	
-	//glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);	// Vertex attributes stay the same
-	//glEnableVertexAttribArray(0);
-	//glBindVertexArray(0);
-	//glDeleteBuffers(1, &vbo);
-	//glDisableVertexAttribArray(vao);
-	loadShader();
-	//end
-
+	float tempFrame = 0;
 	while (!pangolin::ShouldQuit())
 	{
 		
@@ -110,15 +104,26 @@ int main()
 		glClear(GL_COLOR_BUFFER_BIT);
 		pangolin::glDrawAxis(100);
 		//pangolin::glDrawColouredCube();
-		pangolin::glDraw_y0(5, 20);
-		//a triangluate
-		// now when we draw the triangle we first use the vertex and orange fragment shader from the first program
-		//glUseProgram(shader_programme);
-		// draw the first triangle using the data from VAO
-		glBindVertexArray(vao);
-		glDrawArrays(GL_TRIANGLES, 0, 3);	// this call should output a triangle
-		glBindVertexArray(0);
-		glUseProgram(0);
+		pangolin::glDraw_x0(5, 20);
+
+
+        glPointSize(3.0f);
+        glBegin(GL_POINTS);
+
+
+        for (int i = 0; i < laserFrames[tempFrame].framePoints.size(); ++i) {
+            LaserPoint& pt = laserFrames[tempFrame].framePoints[i];
+            glColor3f(5*pt.intense/255.0,5*pt.intense/255.0,5*pt.intense/255.0);
+            glVertex3f(pt.x,pt.y,pt.z);
+        }
+        tempFrame = tempFrame+0.2;
+
+        if(tempFrame >= laserFrames.size()){
+            tempFrame = 0;
+        }
+
+        glEnd();
+
 
 		if (menuReset) {
 			s_cam.SetModelViewMatrix(

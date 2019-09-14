@@ -1,6 +1,8 @@
 # LearnShader
 some stupid test on shader and GPU
 
+### test2: test on laser frames showing
+![projection](https://github.com/kafeiyin00/LearnShader/blob/master/sources/test2.gif)
 
 ### test7: test on cuda projection
 I implement the projection of laser scanning points on image based on 
