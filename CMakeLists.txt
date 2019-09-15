@@ -117,3 +117,12 @@ target_link_libraries(
 		${CUDA_LIBRARIES}
 		${OpenCV_LIBS}
 )
+
+#-- test9 aerial laser scanning to depthmap
+add_executable(test9 test/test_arialFrames.cpp)
+target_link_libraries(
+		test9
+		libcufuncs
+		${CUDA_LIBRARIES}
+		${OpenCV_LIBS}
+)
