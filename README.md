@@ -22,7 +22,7 @@ GPU cost 230ms
 ### test9: test on aerial laser frame calculation
 (1) projection based on cpu
 
-![projection](https://github.com/kafeiyin00/LearnShader/blob/master/sources/test9.jpg)
+![projection](https://github.com/kafeiyin00/LearnShader/blob/master/sources/test9.gif)
 
 
 
