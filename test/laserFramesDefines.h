@@ -9,8 +9,8 @@
 #include <fstream>
 #include <Eigen/Dense>
 
-const int FRAME_WIDTH = 1000;// 360 deg
-const int FRAME_HEIGHT = 500;// 180 deg
+const int FRAME_WIDTH = 1000;// 360 deg -90-90
+const int FRAME_HEIGHT = 500;// 40 deg 70-110
 
 struct LaserPoint {
     double x;
@@ -69,13 +69,13 @@ void framepoints2depthmap(std::vector<LaserPoint>& framePoints, float* depthMap)
         float z = framePoints[i].z;
 
         //bearing vector to theta phi
-        double theta = atan2(y, x) / 3.1415926 * 180.0 + 180.0;
+        double theta = atan2(y, x) / 3.1415926 * 180.0;
         double phi = atan2(sqrt(x*x + y * y), z) / 3.1415926 * 180.0;
         float depth = sqrt(x * x + y * y + z * z);
 
         //theta phi to image coordinates
-        int u = (theta / 360.0)*FRAME_WIDTH;
-        int v = phi / 180.0*FRAME_HEIGHT;
+        int u = ((theta-90) / 180.0)*FRAME_WIDTH;
+        int v = (phi-70) / 40.0*FRAME_HEIGHT;
 
         depthMap[v * FRAME_WIDTH + u] = depth;
     }

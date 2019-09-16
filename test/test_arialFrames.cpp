@@ -15,13 +15,9 @@ void showDepthMap(float* depthMap, int width, int height) {
     {
         for (int j = 1; j < width -1 ; j++)
         {
-            int realJ = j + width/2;
-            if(realJ > width){
-                realJ -= width;
-            }
-            float depth = depthMap[i*width+realJ];
+            float depth = depthMap[i*width+j];
             if(depth > 0){
-                cv::circle(mat_depth,cv::Point(j,i),1,cv::Scalar(depth),1);
+                cv::circle(mat_depth,cv::Point(j,i),2,cv::Scalar(depth),1);
             }
 
             //std::cout << depth << std::endl;
