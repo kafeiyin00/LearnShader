@@ -3,7 +3,7 @@
     {
       "name": "x64",
       "generator": "Visual Studio 15 2017 Win64",
-      "configurationType": "Release",
+      "configurationType": "Debug",
       "buildRoot": "${projectDir}\\build\\${name}",
       "installRoot": "${projectDir}\\install\\${name}",
       "cmakeCommandArgs": "",

@@ -8,7 +8,7 @@
 
 #include <opencv2/opencv.hpp>
 
-void showDepthMap(float* depthMap, int width, int height) {
+void showDepthMap(float* depthMap, int width, int height, std::string windowname) {
     cv::Mat mat_depth(height, width, CV_32FC1);
 
     for (int i = 1; i < height-1; i++)
@@ -39,9 +39,22 @@ void showDepthMap(float* depthMap, int width, int height) {
         }
     }
 
-    cv::namedWindow("test");
-    cv::imshow("test",mat_color);
+    cv::namedWindow(windowname.c_str());
+    cv::imshow(windowname.c_str(),mat_color);
     cv::waitKey(100);
+}
+
+void getMapPoints(std::vector<Eigen::Vector3d>& mapPoints,const std::vector<LaserFrame>& laserFrames){
+    for (int i = 0; i < laserFrames.size(); ++i) {
+        for (int j = 0; j < laserFrames[i].framePoints.size(); ++j) {
+            Eigen::Vector3d pt(
+                    laserFrames[i].framePoints[j].x,
+                    laserFrames[i].framePoints[j].y,
+                    laserFrames[i].framePoints[j].z);
+            Eigen::Vector3d mapPt = laserFrames[i].q_nl*pt+laserFrames[i].r_nl;
+            mapPoints.push_back(mapPt);
+        }
+    }
 }
 
 int main(){
@@ -52,6 +65,9 @@ int main(){
     loadLaserFrames(laserFrames, filename);
     printf("we load => %d <= frames\n",laserFrames.size());
 
+    std::vector<Eigen::Vector3d> mapPoints;
+    getMapPoints(mapPoints,laserFrames);
+    printf("we load => %d <= mapPoints\n",mapPoints.size());
 
     for (int i = 0; i < laserFrames.size(); ++i) {
         float* depthMap = new float[FRAME_WIDTH*FRAME_HEIGHT];
@@ -59,10 +75,19 @@ int main(){
 
         framepoints2depthmap(laserFrames[i].framePoints,depthMap);
 
-        showDepthMap(depthMap,FRAME_WIDTH,FRAME_HEIGHT);
+
+        showDepthMap(depthMap,FRAME_WIDTH,FRAME_HEIGHT,"one frame");
+
+        float* depthMapMapPoints = new float[FRAME_WIDTH*FRAME_HEIGHT];
+        mappoints2depthmap(mapPoints,laserFrames[i].q_nl,laserFrames[i].r_nl,depthMapMapPoints);
+        showDepthMap(depthMapMapPoints,FRAME_WIDTH,FRAME_HEIGHT,"map points");
 
         delete [] depthMap;
+        delete [] depthMapMapPoints;
     }
+
+    // projection for map points
+
 
 
 }

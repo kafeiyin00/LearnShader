@@ -9,7 +9,7 @@
 #include <fstream>
 #include <Eigen/Dense>
 
-const int FRAME_WIDTH = 1000;// 360 deg -90-90
+const int FRAME_WIDTH = 1000;// 180 deg -90-90
 const int FRAME_HEIGHT = 500;// 40 deg 70-110
 
 struct LaserPoint {
@@ -73,11 +73,49 @@ void framepoints2depthmap(std::vector<LaserPoint>& framePoints, float* depthMap)
         double phi = atan2(sqrt(x*x + y * y), z) / 3.1415926 * 180.0;
         float depth = sqrt(x * x + y * y + z * z);
 
+
         //theta phi to image coordinates
         int u = ((theta-90) / 180.0)*FRAME_WIDTH;
         int v = (phi-70) / 40.0*FRAME_HEIGHT;
 
-        depthMap[v * FRAME_WIDTH + u] = depth;
+        int id = v * FRAME_WIDTH + u;
+        if(id <0){
+            continue;
+        }
+
+        depthMap[id] = depth;
+    }
+}
+
+void mappoints2depthmap(const std::vector<Eigen::Vector3d>& mapPoints,
+        const Eigen::Quaterniond q_nl,
+        const Eigen::Vector3d r_nl,
+        float* depthMap){
+    if(depthMap == nullptr){
+        printf("you fogot to allocate the depthMap!!!\n");
+        return;
+    }
+    for (int i = 0; i < mapPoints.size(); ++i) {
+        Eigen::Vector3d localPt = q_nl.inverse()*(mapPoints[i]-r_nl);
+        float x = localPt[0];
+        float y = localPt[1];
+        float z = localPt[2];
+
+        //bearing vector to theta phi
+        double theta = atan2(y, x) / 3.1415926 * 180.0;
+        double phi = atan2(sqrt(x*x + y * y), z) / 3.1415926 * 180.0;
+        float depth = sqrt(x * x + y * y + z * z);
+
+        //theta phi to image coordinates
+        int u = ((theta-90) / 180.0)*FRAME_WIDTH;
+        int v = (phi-70) / 40.0*FRAME_HEIGHT;
+
+        int id = v * FRAME_WIDTH + u;
+        if(id <0 || id > FRAME_WIDTH*FRAME_HEIGHT){
+            continue;
+        }
+
+        depthMap[id] = depth;
     }
 }
 
