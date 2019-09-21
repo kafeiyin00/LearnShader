@@ -8,13 +8,18 @@ find_package(GLEW REQUIRED)
 find_package(GLUT REQUIRED)
 find_package(OpenGL REQUIRED)
 find_package(eigen3 REQUIRED)
+find_package (Glog REQUIRED)
 
 find_package( OpenCV REQUIRED )
+link_directories(D:\\vcpkg\\installed\\x64-windows\\lib)
 
 FIND_PACKAGE(CUDA REQUIRED)
 message("cuda include : ${CUDA_INCLUDE_DIRS} : ${CUDA_LIBRARIES}")
 include_directories(${CUDA_INCLUDE_DIRS})
 cuda_include_directories(${EIGEN_INCLUDE_DIRS})
+set(CUDA_NVCC_FLAGS -v -std=c++11)
+
+
 include_directories("C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v10.0/include")
 
 include_directories("C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v10.0\\include")
@@ -108,6 +113,7 @@ cuda_add_library( libcufuncs SHARED src/cudaFunction.cu)
 target_link_libraries(
 		libcufuncs
 		${CUDA_LIBRARIES}
+		${OpenCV_LIBS}
 )
 
 add_executable(test8 test/test_cudaEstimation.cpp)
@@ -125,4 +131,15 @@ target_link_libraries(
 		libcufuncs
 		${CUDA_LIBRARIES}
 		${OpenCV_LIBS}
+)
+
+#-- test10 aerial laser scan segmentation
+add_executable(test10 test/test_laserScanSeg.cpp)
+target_link_libraries(
+		test10
+		libcufuncs
+		${CUDA_LIBRARIES}
+		${OpenCV_LIBS}
+		pangolin
+		glog
 )

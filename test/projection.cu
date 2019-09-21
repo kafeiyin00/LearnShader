@@ -1,5 +1,8 @@
 #include "projection.cuh"
 #include "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v10.0/include/cuda_runtime.h"
+
+
+
 __global__ void gpu_project(float* d_xs, float* d_ys, float* d_zs,
 	int* prjectionId, float* d_ds, int pointSize) {
 	int idx = blockIdx.x*blockDim.x + threadIdx.x;

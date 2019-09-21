@@ -24,6 +24,11 @@ projection based on cpu
 
 ![projection](https://github.com/kafeiyin00/LearnShader/blob/master/sources/test9.gif)
 
+### test10: test of feature calculation
+based on cpu
+
+![projection](https://github.com/kafeiyin00/LearnShader/blob/master/sources/test10.gif)
+
 
 
 

@@ -75,10 +75,10 @@ int main(){
 
         framepoints2depthmap(laserFrames[i].framePoints,depthMap);
 
-
         showDepthMap(depthMap,FRAME_WIDTH,FRAME_HEIGHT,"one frame");
 
         float* depthMapMapPoints = new float[FRAME_WIDTH*FRAME_HEIGHT];
+        memset(depthMapMapPoints,0,FRAME_WIDTH*FRAME_HEIGHT);
         mappoints2depthmap(mapPoints,laserFrames[i].q_nl,laserFrames[i].r_nl,depthMapMapPoints);
         showDepthMap(depthMapMapPoints,FRAME_WIDTH,FRAME_HEIGHT,"map points");
 
